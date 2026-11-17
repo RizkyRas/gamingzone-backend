@@ -1,0 +1,176 @@
+{
+  "info": {
+    "name": "Gaming Zone REST API (Laravel + MySQL)",
+    "description": "Koleksi Postman resmi untuk pengujian endpoint REST API Gaming Zone sesuai dokumen Opsi A.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "POST Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@gamingzone.id\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] }
+          }
+        },
+        {
+          "name": "POST Register Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Budi Santoso\",\n  \"email\": \"budi@example.com\",\n  \"password\": \"password123\",\n  \"no_hp\": \"081298765432\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/register", "host": ["{{base_url}}"], "path": ["register"] }
+          }
+        },
+        {
+          "name": "GET Current User (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/me", "host": ["{{base_url}}"], "path": ["me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Rooms Catalog",
+      "item": [
+        {
+          "name": "GET Daftar Room",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/rooms", "host": ["{{base_url}}"], "path": ["rooms"] }
+          }
+        },
+        {
+          "name": "GET Detail Room",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/rooms/1", "host": ["{{base_url}}"], "path": ["rooms", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Bookings (Reservasi Room)",
+      "item": [
+        {
+          "name": "POST Buat Booking Baru (DP 30%)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"room_id\": 2,\n  \"nama_pemesan\": \"Rizky Anugrah Surbakti\",\n  \"email_pemesan\": \"rizkyanugrah@gmail.com\",\n  \"no_hp_pemesan\": \"082167890123\",\n  \"tanggal_booking\": \"2026-11-20\",\n  \"jam_mulai\": \"14:00\",\n  \"durasi_jam\": 2,\n  \"catatan\": \"Tolong siapkan stik game tambahan\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/bookings", "host": ["{{base_url}}"], "path": ["bookings"] }
+          }
+        },
+        {
+          "name": "GET Daftar Riwayat Booking",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/bookings", "host": ["{{base_url}}"], "path": ["bookings"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Cafe & Pesanan",
+      "item": [
+        {
+          "name": "GET Daftar Menu Cafe",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/menus", "host": ["{{base_url}}"], "path": ["menus"] }
+          }
+        },
+        {
+          "name": "POST Buat Pesanan Cafe",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nomor_meja\": \"VIP 2\",\n  \"nama_pemesan\": \"Rizky Anugrah Surbakti\",\n  \"items\": [\n    { \"menu_id\": 1, \"qty\": 2 },\n    { \"menu_id\": 2, \"qty\": 1 }\n  ]\n}"
+            },
+            "url": { "raw": "{{base_url}}/orders", "host": ["{{base_url}}"], "path": ["orders"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Midtrans Payment",
+      "item": [
+        {
+          "name": "POST Request Snap Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"booking\",\n  \"docId\": \"1\",\n  \"grossAmount\": 33000,\n  \"customerName\": \"Rizky Anugrah Surbakti\",\n  \"customerEmail\": \"rizkyanugrah@gmail.com\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/payments/create-transaction", "host": ["{{base_url}}"], "path": ["payments", "create-transaction"] }
+          }
+        }
+      ]
+    }
+  ]
+}
+
