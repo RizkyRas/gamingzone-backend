@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\CafeController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,3 +53,11 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/public/bookings', [BookingController::class, 'store']);
 Route::post('/public/orders', [CafeController::class, 'storeOrder']);
 Route::get('/public/notifications', [NotificationController::class, 'index']);
+
+// Users Management APIs
+Route::get('/users', [UserController::class, 'index']);
+Route::post('/users', [UserController::class, 'store']);
+Route::get('/users/{id}', [UserController::class, 'show']);
+Route::match(['put', 'patch'], '/users/{id}', [UserController::class, 'update']);
+Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
