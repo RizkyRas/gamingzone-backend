@@ -61,3 +61,12 @@ Route::get('/users/{id}', [UserController::class, 'show']);
 Route::match(['put', 'patch'], '/users/{id}', [UserController::class, 'update']);
 Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
+// QA & Testing Endpoint for 500 Internal Server Error
+Route::get('/test-500', function () {
+    return response()->json([
+        'success' => false,
+        'message' => 'Simulasi Internal Server Error 500 untuk Pengujian REST API GamingZone'
+    ], 500);
+});
+
+
