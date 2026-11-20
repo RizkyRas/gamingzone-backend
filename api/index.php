@@ -1,5 +1,9 @@
 <?php
 
+// Normalize SCRIPT_NAME so Symfony/Laravel doesn't treat /api as baseUrl subfolder
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['PHP_SELF'] = '/index.php';
+
 // 1. Prepare writable directory in /tmp for Vercel serverless environment
 $storagePath = '/tmp/storage';
 $dirs = [
