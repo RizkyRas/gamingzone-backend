@@ -49,8 +49,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 });
 
-// Fallback guest bookings (if user not logged in via bearer token)
+// Fallback guest bookings & orders (if user not logged in via bearer token)
 Route::post('/public/bookings', [BookingController::class, 'store']);
+Route::get('/public/orders', [CafeController::class, 'getOrders']);
 Route::post('/public/orders', [CafeController::class, 'storeOrder']);
 Route::get('/public/notifications', [NotificationController::class, 'index']);
 

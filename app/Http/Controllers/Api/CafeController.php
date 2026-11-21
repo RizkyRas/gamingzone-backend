@@ -35,6 +35,10 @@ class CafeController extends Controller
 
         if ($user && $user->role !== 'admin') {
             $query->where('user_id', $user->id);
+        } elseif ($request->filled('nama_pemesan')) {
+            $query->where('nama_pemesan', $request->nama_pemesan);
+        } elseif ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
         }
 
         return response()->json([
@@ -49,38 +53,40 @@ class CafeController extends Controller
             'nomor_meja' => 'required|string',
             'nama_pemesan' => 'required|string',
             'items' => 'required|array|min:1',
-            'items.*.menu_id' => 'required|exists:menus,id',
             'items.*.qty' => 'required|integer|min:1',
         ]);
 
         $user = $request->user();
 
-        return DB::transaction(function () use ($validated, $user) {
+        return DB::transaction(function () use ($validated, $user, $request) {
             $totalHarga = 0;
             $itemsData = [];
 
             foreach ($validated['items'] as $item) {
-                $menu = Menu::findOrFail($item['menu_id']);
-                $subtotal = $menu->harga * $item['qty'];
+                $menuId = isset($item['menu_id']) && is_numeric($item['menu_id']) ? intval($item['menu_id']) : null;
+                $menu = $menuId ? Menu::find($menuId) : null;
+                $nama = $menu ? $menu->nama : ($item['nama'] ?? $item['nama_menu'] ?? 'Menu');
+                $harga = $menu ? $menu->harga : (isset($item['harga']) ? intval($item['harga']) : 25000);
+                $subtotal = $harga * $item['qty'];
                 $totalHarga += $subtotal;
 
                 $itemsData[] = [
-                    'menu_id' => $menu->id,
-                    'nama_menu' => $menu->nama,
-                    'harga' => $menu->harga,
+                    'menu_id' => $menu ? $menu->id : 1,
+                    'nama_menu' => $nama,
+                    'harga' => $harga,
                     'qty' => $item['qty'],
                     'subtotal' => $subtotal,
                 ];
             }
 
             $order = Order::create([
-                'no_invoice' => 'INV-CAFE-' . strtoupper(uniqid()),
+                'no_invoice' => $request->input('no_invoice') ?? ('INV-CAFE-' . strtoupper(uniqid())),
                 'user_id' => $user ? $user->id : null,
                 'nama_pemesan' => $validated['nama_pemesan'],
                 'nomor_meja' => $validated['nomor_meja'],
                 'total_harga' => $totalHarga,
-                'status' => 'menunggu',
-                'status_pembayaran' => 'belum_bayar',
+                'status' => $request->input('status', 'diproses'),
+                'status_pembayaran' => $request->input('status_pembayaran', 'lunas'),
             ]);
 
             foreach ($itemsData as $data) {
