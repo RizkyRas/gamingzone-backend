@@ -54,6 +54,10 @@ class CafeController extends Controller
             'nama_pemesan' => 'required|string',
             'items' => 'required|array|min:1',
             'items.*.qty' => 'required|integer|min:1',
+            'items.*.nama' => 'nullable|string',
+            'items.*.nama_menu' => 'nullable|string',
+            'items.*.harga' => 'nullable',
+            'items.*.menu_id' => 'nullable',
         ]);
 
         $user = $request->user();
@@ -62,19 +66,24 @@ class CafeController extends Controller
             $totalHarga = 0;
             $itemsData = [];
 
-            foreach ($validated['items'] as $item) {
+            $rawItems = $request->input('items', []);
+
+            foreach ($rawItems as $item) {
+                $qty = isset($item['qty']) ? intval($item['qty']) : 1;
                 $menuId = isset($item['menu_id']) && is_numeric($item['menu_id']) ? intval($item['menu_id']) : null;
                 $menu = $menuId ? Menu::find($menuId) : null;
-                $nama = $menu ? $menu->nama : ($item['nama'] ?? $item['nama_menu'] ?? 'Menu');
-                $harga = $menu ? $menu->harga : (isset($item['harga']) ? intval($item['harga']) : 25000);
-                $subtotal = $harga * $item['qty'];
+                $nama = $item['nama'] ?? $item['nama_menu'] ?? ($menu ? $menu->nama : 'Menu');
+                $harga = isset($item['harga']) && is_numeric($item['harga']) 
+                    ? floatval($item['harga']) 
+                    : ($menu ? floatval($menu->harga) : 25000);
+                $subtotal = $harga * $qty;
                 $totalHarga += $subtotal;
 
                 $itemsData[] = [
                     'menu_id' => $menu ? $menu->id : 1,
                     'nama_menu' => $nama,
                     'harga' => $harga,
-                    'qty' => $item['qty'],
+                    'qty' => $qty,
                     'subtotal' => $subtotal,
                 ];
             }
