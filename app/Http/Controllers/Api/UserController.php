@@ -13,9 +13,15 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::orderBy('created_at', 'desc')->get()->map(function ($u) {
+        $query = User::orderBy('created_at', 'desc');
+
+        if ($request->has('role') && !empty($request->role) && $request->role !== 'Semua') {
+            $query->where('role', $request->role);
+        }
+
+        $users = $query->get()->map(function ($u) {
             return [
                 'id' => (string) $u->id,
                 'nama' => $u->name,
